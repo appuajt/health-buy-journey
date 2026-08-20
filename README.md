@@ -19,6 +19,18 @@ network for `npm install` to resolve the design system packages.
 | `npm run lint` | ESLint — zero errors |
 | `npm run build` | Typecheck + production build |
 
+## Preview harness
+
+Opened on a screen wider than 1100px, the app presents a reviewer shell: a **Mobile /
+Web** toggle that renders the screen inside a device-sized frame. Below that width the
+real screen takes the whole viewport.
+
+The frame is an `<iframe>`, not a scaled-down `div`, so the screen's media queries and
+its `position: fixed` chrome resolve against the frame's own viewport — the mobile
+preview is genuinely 360px wide rather than a desktop render squeezed into a box.
+
+Append `?embed=1` to load the bare screen with no harness.
+
 ## Things to try
 
 - `/?quoteError=1` — forces the quote failure path, with retry

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@acko/button";
 import { Typography } from "@acko/typography";
 import { ArrowLeft } from "@acko/icons";
@@ -6,9 +6,6 @@ import { ArrowLeft } from "@acko/icons";
 interface PageTopBarProps {
   title: string;
   onBack: () => void;
-  /** Trailing action, shown from tablet up. Hidden on mobile where the
-   *  sticky bottom bar owns the page-level action. */
-  action?: ReactNode;
 }
 
 /**
@@ -17,7 +14,7 @@ interface PageTopBarProps {
  *
  * Custom component — logged in missing-components-all-plans-platinum.md.
  */
-export function PageTopBar({ title, onBack, action }: PageTopBarProps) {
+export function PageTopBar({ title, onBack }: PageTopBarProps) {
   const [raised, setRaised] = useState(false);
   const frame = useRef<number | null>(null);
 
@@ -56,8 +53,6 @@ export function PageTopBar({ title, onBack, action }: PageTopBarProps) {
         <Typography variant="heading-sm" weight="semibold" as="h1" className="min-w-0 flex-1">
           {title}
         </Typography>
-
-        {action ? <div className="hidden tablet:block">{action}</div> : null}
       </div>
     </header>
   );

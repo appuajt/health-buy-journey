@@ -49,8 +49,8 @@ export function AllHealthPlansPage() {
   const compareButton = (
     <Button
       variant="secondary"
-      size={isTabletUp ? "md" : "lg"}
-      fullWidth={!isTabletUp}
+      size="lg"
+      fullWidth
       disabled={status !== "ready"}
       onClick={() => setCompareOpen(true)}
     >
@@ -60,11 +60,7 @@ export function AllHealthPlansPage() {
 
   return (
     <div className="min-h-screen">
-      <PageTopBar
-        title="All health plans"
-        onBack={() => window.history.back()}
-        action={compareButton}
-      />
+      <PageTopBar title="All health plans" onBack={() => window.history.back()} />
 
       {/* Bottom padding clears both fixed layers on mobile: the action bar
           (96px) and the FAB stacked above it. Tablet up has neither pinned. */}
@@ -107,6 +103,13 @@ export function AllHealthPlansPage() {
                 ))}
           </div>
         )}
+
+        {/* Compare sits below both cards. Tablet up it lives here in the flow;
+            on mobile the same action is pinned to the bottom of the viewport so
+            it is reachable without scrolling to the end of the list. */}
+        {status !== "error" ? (
+          <div className="hidden tablet:block">{compareButton}</div>
+        ) : null}
         </div>
       </main>
 

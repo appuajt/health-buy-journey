@@ -385,6 +385,52 @@ label {
   width: 34%;
 }
 
+/* ─── Preview harness ───────────────────────────────────────────────────────
+   Reviewer-facing shell for the published demo — not product UI. Renders the
+   screen in a device-sized iframe so its breakpoints and fixed chrome behave
+   exactly as they would on the device.
+   ────────────────────────────────────────────────────────────────────────── */
+.preview-shell {
+  @apply grid min-h-screen;
+  grid-template-columns: 260px minmax(0, 1fr);
+  background-color: var(--surfaceBase);
+}
+
+.preview-sidebar {
+  @apply flex flex-col justify-between gap-32 p-32;
+  border-right: var(--borderHairline) solid var(--borderSubtle);
+  background-color: var(--surfaceFillCard);
+}
+
+.preview-stage {
+  @apply flex flex-col items-center gap-24 p-40;
+}
+
+.preview-stage > *:first-child {
+  @apply self-start;
+}
+
+.preview-frame-space {
+  @apply flex w-full justify-center;
+}
+
+.preview-frame {
+  @apply overflow-hidden;
+  transform-origin: top center;
+  background-color: var(--surfaceBase);
+  border: var(--borderHairline) solid var(--borderSubtle);
+  border-radius: var(--radius2xl);
+  box-shadow: var(--shadowL);
+}
+
+.preview-frame--bezel {
+  border-radius: var(--radius4xl);
+}
+
+.preview-frame iframe {
+  @apply block border-none;
+}
+
 /* ─── Reduced motion (touch-accessibility.md) ─────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .plan-reveal {
