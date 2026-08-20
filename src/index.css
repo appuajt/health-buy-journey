@@ -1,0 +1,409 @@
+@import "tailwindcss";
+
+@import "@acko/tokens/tokens.css";
+@import "@acko/tokens/theme.css";
+
+@import "@acko/css/accordion.css";
+@import "@acko/css/alert.css";
+@import "@acko/css/avatar.css";
+@import "@acko/css/badge.css";
+@import "@acko/css/breadcrumb.css";
+@import "@acko/css/button.css";
+@import "@acko/css/calendar.css";
+@import "@acko/css/card.css";
+@import "@acko/css/checkbox.css";
+@import "@acko/css/chip.css";
+@import "@acko/css/dialog.css";
+@import "@acko/css/drawer.css";
+@import "@acko/css/dropdown.css";
+@import "@acko/css/field.css";
+@import "@acko/css/input-group.css";
+@import "@acko/css/label.css";
+@import "@acko/css/navigation-wizard.css";
+@import "@acko/css/pagination.css";
+@import "@acko/css/progress.css";
+@import "@acko/css/radio.css";
+@import "@acko/css/scroll-area.css";
+@import "@acko/css/separator.css";
+@import "@acko/css/skeleton.css";
+@import "@acko/css/surface.css";
+@import "@acko/css/switch.css";
+@import "@acko/css/table.css";
+@import "@acko/css/tabs.css";
+@import "@acko/css/text-input.css";
+@import "@acko/css/textarea.css";
+@import "@acko/css/toggle.css";
+@import "@acko/css/tooltip.css";
+@import "@acko/css/typography.css";
+
+/* ─── Breakpoints ───────────────────────────────────────────────────────────
+   ACKO canonical breakpoints per responsiveness.md: 600px tablet, 1024px
+   desktop. Added as named screens so utilities read `tablet:` / `desktop:`
+   instead of Tailwind's default 768/1024. --spacing is NEVER redefined here —
+   it stays owned by @acko/tokens/theme.css.
+   ────────────────────────────────────────────────────────────────────────── */
+@theme {
+  --breakpoint-tablet: 600px;
+  --breakpoint-desktop: 1024px;
+}
+
+/* ─── Font ──────────────────────────────────────────────────────────────────
+   Euclid Circular B from the ACKO CDN (ui-polish.md → font base URL).
+   ────────────────────────────────────────────────────────────────────────── */
+@font-face {
+  font-family: "Euclid Circular B";
+  src: url("https://pub-c050457d48794d5bb9ffc2b4649de2c1.r2.dev/Euclid%20Font/EuclidCircularB-Light.otf")
+    format("opentype");
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Euclid Circular B";
+  src: url("https://pub-c050457d48794d5bb9ffc2b4649de2c1.r2.dev/Euclid%20Font/EuclidCircularB-Regular.otf")
+    format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Euclid Circular B";
+  src: url("https://pub-c050457d48794d5bb9ffc2b4649de2c1.r2.dev/Euclid%20Font/EuclidCircularB-Medium.otf")
+    format("opentype");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Euclid Circular B";
+  src: url("https://pub-c050457d48794d5bb9ffc2b4649de2c1.r2.dev/Euclid%20Font/EuclidCircularB-Semibold.otf")
+    format("opentype");
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Euclid Circular B";
+  src: url("https://pub-c050457d48794d5bb9ffc2b4649de2c1.r2.dev/Euclid%20Font/EuclidCircularB-Bold.otf")
+    format("opentype");
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* ─── Motion easing ─────────────────────────────────────────────────────────
+   @acko/tokens ships only --easeOutCubic. The values below are declared
+   APPROXIMATIONS of the acko-motion-system ease-in (velocity 0→100, out 40%,
+   in 50%) and ease-in-out (velocity 0→100→0, out 50%, in 40%) curves, kept in
+   one place so they can be swapped for real tokens when the package ships them.
+   ────────────────────────────────────────────────────────────────────────── */
+:root {
+  --appEaseIn: cubic-bezier(0.32, 0, 0.67, 0);
+  --appEaseInOut: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: var(--typefaceFamily), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--surfaceBase);
+  color: var(--textPrimary);
+}
+
+button,
+a,
+input,
+select,
+label {
+  touch-action: manipulation;
+}
+
+/* ─── @acko/css ↔ @acko/tokens compatibility shim ───────────────────────────
+   @acko/css@3.0.4 references roughly 170 tokens that @acko/tokens@2.0.6 does
+   not define — mostly the `--color*` names removed in the tokens v2 rename,
+   plus some that were never shipped. A `var()` pointing at an undefined custom
+   property makes the whole declaration invalid, so the affected components
+   render with no fill, no border, or no radius at all.
+
+   Verified symptoms: every Card square · every Surface and Dialog transparent
+   (no scrim) · every Skeleton invisible · Table with no borders or header fill
+   · red Badge unstyled.
+
+   Below is a shim for the components THIS screen uses, mapped via the
+   documented legacy → v2 migration table in the design system's semantics
+   reference. It re-points names at existing tokens — no raw values — and
+   should be deleted once the two packages are back in sync. The remaining
+   families (wizard, toast, tabs, toggle, chip-selector, navbar, slider,
+   progress, calendar, inverted/danger buttons) are still broken and need the
+   same treatment; that belongs in the design system, not here.
+
+   Logged in missing-components-all-plans-platinum.md.
+   ────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Text */
+  --colorTextDefault: var(--textPrimary);
+  --colorTextPrimary: var(--textPrimary);
+  --colorTextSecondary: var(--textSecondary);
+  --colorTextSupporting: var(--textTertiary);
+
+  /* Surfaces + borders */
+  --colorSurface: var(--surfaceBase);
+  --colorSurfaceRaised: var(--surfaceRaised);
+  --colorSurfaceRaisedHover: var(--surfaceRaisedHover);
+  --colorSurfaceOverlay: var(--surfaceOverlay);
+  --colorBorderSubtle: var(--borderSubtle);
+  --colorDisabledBg: var(--disabledBg);
+  --surfaceBasePrimary: var(--surfacePrimaryBg);
+  --surfaceBaseSecondary: var(--surfaceSecondaryBg);
+
+  /* Card — --radius5xl was never shipped; 20px is the documented card radius */
+  --radius5xl: var(--radius4xl);
+  --cardBorderSecondary: var(--cardBorderDefault);
+
+  /* Button text roles. button.css documents secondary as "surface fill + brand
+     border" and ghost as "transparent fill, brand text", so secondary takes the
+     brand text colour to match its brand border. Ghost is deliberately left
+     neutral: its only use here is the top-bar back affordance, which is
+     navigation chrome rather than a brand action. */
+  --buttonFillSecondaryText: var(--textBrand);
+  --buttonFillGhostText: var(--textPrimary);
+
+  /* Table */
+  --colorTableBorder: var(--tableBorder);
+  --colorTableHeaderBg: var(--tableHeaderBg);
+  --colorTableHeaderText: var(--tableHeaderText);
+  --colorTableStripe: var(--tableStripe);
+  --colorTableRowHover: var(--tableRowHover);
+
+  /* Badge — the red hue is referenced by badge.css but never defined */
+  --badgeRedFill: var(--statusErrorSubtle);
+  --badgeRedText: var(--statusErrorText);
+  --badgeRedGradientFrom: var(--statusErrorBase);
+  --badgeRedGradientTo: var(--statusErrorBase);
+  --badgeRedCounterFill: var(--statusErrorBase);
+  --badgeCountTextLight: var(--textStaticLight);
+
+  /* Shadows + easing (legacy names) */
+  --shadowLg: var(--shadowL);
+  --shadowMd: var(--shadowM);
+  --shadowModal: var(--shadowXl);
+  --shadowFocusRing: 0 0 0 3px var(--borderFocus);
+  --easeOutQuad: var(--easeOutCubic);
+  --easeOutQuart: var(--easeOutCubic);
+  --easeInOutCubic: var(--appEaseInOut);
+
+  /* Alert — @acko/tokens aliases the warning SURFACE to the warning BORDER
+     token, so the callout fills solid with its own border colour and the
+     border vanishes. Repointed at the intended subtle tint. */
+  --alertWarningSurface: var(--statusWarningSubtle);
+}
+
+/* @acko/css@3.0.4 skeleton.css builds its wave from the removed --colorSurface;
+   the shipped shimmer token is the correct source. */
+.acko-skeleton {
+  background: var(--skeletonBase);
+}
+
+/* ─── Typography variant API — missing entirely from @acko/css@3.0.4 ─────────
+   typography.css styles only the newer `scale` + `emphasis` classes
+   (.acko-text-*). It ships NO rules for the `variant` + `weight` API
+   (.acko-typography-heading-md, .acko-typography-weight-bold, …) that the
+   Typography component still emits and that the design system's own typography
+   guidance tells you to use.
+
+   Effect: every <Typography variant="…"> renders at the inherited 16px/400.
+   Heading, body, label and caption are visually identical — the entire type
+   hierarchy silently collapses.
+
+   The font tokens themselves all exist, so this just wires the documented
+   variants to them. Delete once @acko/css ships these rules.
+   ────────────────────────────────────────────────────────────────────────── */
+.acko-typography-display-xl { font: var(--fontDisplayXlWeight) var(--fontDisplayXlSize) / var(--fontDisplayXlLine) var(--typefaceFamily); letter-spacing: var(--fontDisplayXlSpacing); }
+.acko-typography-display-lg { font: var(--fontDisplayLgWeight) var(--fontDisplayLgSize) / var(--fontDisplayLgLine) var(--typefaceFamily); letter-spacing: var(--fontDisplayLgSpacing); }
+.acko-typography-display-md { font: var(--fontDisplayMdWeight) var(--fontDisplayMdSize) / var(--fontDisplayMdLine) var(--typefaceFamily); letter-spacing: var(--fontDisplayMdSpacing); }
+.acko-typography-display-sm { font: var(--fontDisplaySmWeight) var(--fontDisplaySmSize) / var(--fontDisplaySmLine) var(--typefaceFamily); letter-spacing: var(--fontDisplaySmSpacing); }
+.acko-typography-heading-xl { font: var(--fontHeadingXlWeight) var(--fontHeadingXlSize) / var(--fontHeadingXlLine) var(--typefaceFamily); letter-spacing: var(--fontHeadingXlSpacing); }
+.acko-typography-heading-lg { font: var(--fontHeadingLgWeight) var(--fontHeadingLgSize) / var(--fontHeadingLgLine) var(--typefaceFamily); letter-spacing: var(--fontHeadingLgSpacing); }
+.acko-typography-heading-md { font: var(--fontHeadingMdWeight) var(--fontHeadingMdSize) / var(--fontHeadingMdLine) var(--typefaceFamily); letter-spacing: var(--fontHeadingMdSpacing); }
+.acko-typography-heading-sm { font: var(--fontHeadingSmWeight) var(--fontHeadingSmSize) / var(--fontHeadingSmLine) var(--typefaceFamily); letter-spacing: var(--fontHeadingSmSpacing); }
+.acko-typography-body-lg { font: var(--fontBodyLgWeight) var(--fontBodyLgSize) / var(--fontBodyLgLine) var(--typefaceFamily); letter-spacing: var(--fontBodyLgSpacing); }
+.acko-typography-body-md { font: var(--fontBodyMdWeight) var(--fontBodyMdSize) / var(--fontBodyMdLine) var(--typefaceFamily); letter-spacing: var(--fontBodyMdSpacing); }
+.acko-typography-body-sm { font: var(--fontBodySmWeight) var(--fontBodySmSize) / var(--fontBodySmLine) var(--typefaceFamily); letter-spacing: var(--fontBodySmSpacing); }
+.acko-typography-label-lg { font: var(--fontLabelLgWeight) var(--fontLabelLgSize) / var(--fontLabelLgLine) var(--typefaceFamily); letter-spacing: var(--fontLabelLgSpacing); }
+.acko-typography-label-md { font: var(--fontLabelMdWeight) var(--fontLabelMdSize) / var(--fontLabelMdLine) var(--typefaceFamily); letter-spacing: var(--fontLabelMdSpacing); }
+.acko-typography-label-sm { font: var(--fontLabelSmWeight) var(--fontLabelSmSize) / var(--fontLabelSmLine) var(--typefaceFamily); letter-spacing: var(--fontLabelSmSpacing); }
+.acko-typography-caption { font: var(--fontCaptionWeight) var(--fontCaptionSize) / var(--fontCaptionLine) var(--typefaceFamily); letter-spacing: var(--fontCaptionSpacing); }
+.acko-typography-overline { font: var(--fontOverlineWeight) var(--fontOverlineSize) / var(--fontOverlineLine) var(--typefaceFamily); letter-spacing: var(--fontOverlineSpacing); }
+
+/* Weight override — must win over the variant's own weight, so it follows the
+   variant rules above and never sets any other property (responsiveness.md:
+   weight is an independent axis and must not shift across breakpoints). */
+.acko-typography.acko-typography-weight-regular { font-weight: var(--typefaceWeightRegular); }
+.acko-typography.acko-typography-weight-medium { font-weight: var(--typefaceWeightMedium); }
+.acko-typography.acko-typography-weight-semibold { font-weight: var(--typefaceWeightSemibold); }
+.acko-typography.acko-typography-weight-bold { font-weight: var(--typefaceWeightBold); }
+
+.acko-skeleton-wave {
+  background: linear-gradient(
+    90deg,
+    var(--skeletonBase) 0%,
+    var(--skeletonShimmer) 50%,
+    var(--skeletonBase) 100%
+  );
+  background-size: 200% 100%;
+}
+
+/* ─── Section container (layout.md) ─────────────────────────────────────────
+   Gutters are internal padding: 16px mobile, 32px tablet, 40px desktop.
+   Fluid until 1280px, then capped and centred.
+   ────────────────────────────────────────────────────────────────────────── */
+.section-container {
+  @apply mx-auto w-full max-w-1280 px-16 tablet:px-32 desktop:px-40;
+}
+
+/* ─── Page top bar ──────────────────────────────────────────────────────── */
+.page-top-bar {
+  @apply sticky top-0 w-full;
+  z-index: var(--zSticky);
+  background-color: var(--surfaceBase);
+  border-bottom: var(--borderHairline) solid transparent;
+  transition:
+    border-color 160ms var(--easeOutCubic),
+    box-shadow 160ms var(--easeOutCubic);
+}
+
+.page-top-bar--raised {
+  border-bottom-color: var(--borderSubtle);
+}
+
+/* ─── Plan card reveal — motion.medium.enter, 300ms ease-out, 56ms stagger ── */
+@keyframes plan-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.plan-reveal {
+  animation: plan-reveal 300ms var(--easeOutCubic) both;
+  animation-delay: calc(var(--planIndex, 0) * 56ms);
+}
+
+/* Benefit tick — 16px inline icon beside body text (iconography.md) */
+.benefit-tick {
+  @apply inline-flex size-16 shrink-0;
+  margin-top: 4px;
+  color: var(--statusSuccessText);
+}
+
+.benefit-tick > svg {
+  @apply size-full;
+}
+
+/* Error state glyph — 32px hero-scale icon */
+.error-glyph {
+  @apply inline-flex size-32 shrink-0;
+  color: var(--statusErrorBase);
+}
+
+.error-glyph > svg {
+  @apply size-full;
+}
+
+/* ─── Sticky action bar ─────────────────────────────────────────────────────
+   Fill comes from <Surface>; this owns only the pinning, the safe area, and
+   the scroll-state elevation.
+   ────────────────────────────────────────────────────────────────────────── */
+.sticky-action-bar-anchor {
+  @apply fixed inset-x-0 bottom-0 w-full;
+  z-index: var(--zSticky);
+  transition: box-shadow 160ms var(--easeOutCubic);
+}
+
+.sticky-action-bar-anchor--raised {
+  box-shadow: var(--shadowM);
+}
+
+/* 24px rather than the 16px gutter: the CTA was sitting flush against the
+   bottom edge, so any browser chrome or device safe area clipped it. */
+.sticky-action-bar-inner {
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
+
+/* ─── Chat or call FAB ──────────────────────────────────────────────────────
+   The pill is an @acko/button and the indicator an @acko/badge CounterBadge.
+   This anchor owns only the fixed position, the safe-area offset, and the
+   elevation a Button has no variant for.
+   ────────────────────────────────────────────────────────────────────────── */
+.chat-fab-anchor {
+  @apply fixed;
+  /* 24px, not the 16px page gutter: the counter badge overhangs the pill's
+     top-right corner, so the gutter alone left it only 12px from the edge. */
+  right: 24px;
+  bottom: calc(var(--chatFabOffset, 16px) + env(safe-area-inset-bottom));
+  z-index: var(--zSticky);
+  transition: bottom 200ms var(--appEaseInOut);
+}
+
+.chat-fab-anchor .acko-button {
+  box-shadow: var(--shadowM);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .chat-fab-anchor .acko-button:hover {
+    box-shadow: var(--shadowL);
+  }
+}
+
+.chat-fab-counter {
+  @apply absolute;
+  top: -4px;
+  right: -4px;
+}
+
+/* ─── Plan comparison table ─────────────────────────────────────────────────
+   Criteria column sized to fit its labels; plan columns share what's left, so
+   three columns stay readable at 360px without a horizontal scroll. The
+   wrapper's overflow-x is the safety net if a longer value ever lands here.
+   ────────────────────────────────────────────────────────────────────────── */
+.compare-table {
+  table-layout: fixed;
+}
+
+.compare-table th,
+.compare-table td {
+  @apply px-12 py-12 align-top;
+  overflow-wrap: break-word;
+}
+
+.compare-table-criterion {
+  @apply text-left font-normal;
+  width: 34%;
+}
+
+/* ─── Reduced motion (touch-accessibility.md) ─────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .plan-reveal {
+    animation-duration: 150ms;
+    animation-delay: 0ms;
+    animation-name: plan-reveal-fade;
+  }
+
+  .chat-fab-anchor {
+    transition: none;
+  }
+
+  @keyframes plan-reveal-fade {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+}
