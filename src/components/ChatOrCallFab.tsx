@@ -27,7 +27,7 @@ export function ChatOrCallFab({ unread, onOpen, bottomOffset }: ChatOrCallFabPro
     >
       <Button
         variant="secondary"
-        size="lg"
+        size="md"
         iconRight={<CustomerService aria-hidden="true" />}
         onClick={onOpen}
         aria-label={unread ? "Chat or call, 1 new message" : "Chat or call"}
