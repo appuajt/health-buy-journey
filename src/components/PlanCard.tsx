@@ -29,8 +29,10 @@ export function PlanCard({ plan, index, onViewDetails }: PlanCardProps) {
     >
       <div className="flex h-full flex-col gap-16 p-20 tablet:p-24">
         {/* heading-sm is 20px in the shipped token scale — heading-md is 24px,
-            which wraps the longer plan name onto two lines. */}
-        <Typography variant="heading-sm" weight="bold" align="center" as="h2">
+            which wraps the longer plan name onto two lines. Weight is
+            semibold, not bold: typography.md is explicit that bold is for
+            display variants only, headings take semibold. */}
+        <Typography variant="heading-sm" weight="semibold" align="center" as="h2">
           {plan.name}
         </Typography>
 
