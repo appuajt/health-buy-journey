@@ -15,11 +15,21 @@ export const DEVICES: DevicePreset[] = [
   {
     id: "mobile",
     label: "Mobile",
-    width: 360,
-    height: 800,
-    caption: "Mobile web · 360×800",
+    width: 390,
+    height: 844,
+    caption: "Mobile web · 390×844",
     blurb:
       "Mobile view — plans stack full-width and the compare action pins to the bottom of the viewport.",
+    bezel: true,
+  },
+  {
+    id: "narrow",
+    label: "Narrow",
+    width: 360,
+    height: 800,
+    caption: "Narrow phone · 360×800",
+    blurb:
+      "The 360px floor — the narrowest width the screen supports. Type and price lines wrap harder here than on a typical phone.",
     bezel: true,
   },
   {

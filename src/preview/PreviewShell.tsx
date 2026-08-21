@@ -31,17 +31,32 @@ export function PreviewShell() {
     const stage = stageRef.current;
     if (!stage) return;
 
+    // Fit on both axes so the whole frame is visible without scrolling the
+    // harness — the 844px phone is taller than a laptop stage.
     const fit = () => {
-      const available = stage.clientWidth - 48;
-      setScale(Math.min(1, available / device.width));
+      const availableWidth = stage.clientWidth - 48;
+      const availableHeight =
+        window.innerHeight - stage.getBoundingClientRect().top - 120;
+
+      setScale(
+        Math.min(
+          1,
+          availableWidth / device.width,
+          availableHeight / device.height,
+        ),
+      );
     };
 
     fit();
     const observer = new ResizeObserver(fit);
     observer.observe(stage);
+    window.addEventListener("resize", fit);
 
-    return () => observer.disconnect();
-  }, [device.width]);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", fit);
+    };
+  }, [device.width, device.height]);
 
   const frameSrc = `${window.location.pathname}?embed=1`;
 
