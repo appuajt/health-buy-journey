@@ -33,6 +33,16 @@ export const DEVICES: DevicePreset[] = [
     bezel: true,
   },
   {
+    id: "tablet",
+    label: "Tablet",
+    width: 768,
+    height: 1024,
+    caption: "Tablet · 768×1024",
+    blurb:
+      "Tablet view — past the 600px breakpoint, so compare moves into the flow below the cards and the sticky bar drops away.",
+    bezel: true,
+  },
+  {
     id: "web",
     label: "Web",
     width: 1280,

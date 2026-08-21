@@ -82,7 +82,8 @@ export function PreviewShell() {
                 if (typeof value === "string" && value) setDeviceId(value);
               }}
               size="md"
-              className="flex-col items-stretch"
+              variant="outline"
+              className="preview-view-toggle"
             >
               {DEVICES.map((option) => (
                 <ToggleGroupItem key={option.id} value={option.id}>

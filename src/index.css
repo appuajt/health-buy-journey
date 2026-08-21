@@ -167,6 +167,16 @@ label {
   --buttonFillSecondaryText: var(--textBrand);
   --buttonFillGhostText: var(--textPrimary);
 
+  /* Toggle — toggle.css reads --colorToggle*, so without these the unpressed
+     items render as bare text with no fill or border. */
+  --colorToggleBg: var(--surfaceFillCard);
+  --colorToggleText: var(--textPrimary);
+  --colorToggleBgHover: var(--surfaceFillHover);
+  --colorToggleActiveBg: var(--fillBrandSubtle);
+  --colorToggleActiveText: var(--textBrand);
+  --colorBorder: var(--borderDefault);
+  --colorPrimaryHover: var(--fillBrandHover);
+
   /* Table */
   --colorTableBorder: var(--tableBorder);
   --colorTableHeaderBg: var(--tableHeaderBg);
@@ -400,6 +410,17 @@ label {
   @apply flex flex-col justify-between gap-32 p-32;
   border-right: var(--borderHairline) solid var(--borderSubtle);
   background-color: var(--surfaceFillCard);
+}
+
+/* Stack the view options full-width so they read as a list of choices,
+   matching the screens button below them. .acko-toggle is inline-flex by
+   default, so each item has to be widened explicitly. */
+.preview-view-toggle {
+  @apply flex w-full flex-col items-stretch gap-8;
+}
+
+.preview-view-toggle > .acko-toggle {
+  @apply w-full;
 }
 
 .preview-stage {
