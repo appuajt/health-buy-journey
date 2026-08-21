@@ -1,0 +1,55 @@
+diff --git a/node_modules/@acko/drawer/dist/Drawer.js b/node_modules/@acko/drawer/dist/Drawer.js
+index 1bed23d..775ad8a 100644
+--- a/node_modules/@acko/drawer/dist/Drawer.js
++++ b/node_modules/@acko/drawer/dist/Drawer.js
+@@ -9,11 +9,32 @@ export const Drawer = forwardRef(({ open, onClose, side = "right", size = "md",
+     const panelRef = useRef(null);
+     const previousFocusRef = useRef(null);
+     const [mounted, setMounted] = useState(false);
++    // PATCHED (see patches/@acko+drawer+3.0.4.patch): `rendered` controls DOM
++    // presence, `visible` controls the "-open" class that drives the CSS
++    // transform transition. The stock component collapsed both into the
++    // `open` prop, so the very first paint of the panel already carried the
++    // "-open" class — there was no closed frame for the transition to run
++    // from, and the panel was removed from the DOM the instant `open` went
++    // false, skipping the close transition too.
++    const [rendered, setRendered] = useState(open);
++    const [visible, setVisible] = useState(false);
+     const hasHeader = Boolean(title || description || dismissible);
+     useImperativeHandle(ref, () => panelRef.current);
+     useEffect(() => {
+         setMounted(true);
+     }, []);
++    useEffect(() => {
++        if (open) {
++            setRendered(true);
++            let frame = requestAnimationFrame(() => {
++                frame = requestAnimationFrame(() => setVisible(true));
++            });
++            return () => cancelAnimationFrame(frame);
++        }
++        setVisible(false);
++        const timeout = setTimeout(() => setRendered(false), 360);
++        return () => clearTimeout(timeout);
++    }, [open]);
+     useEffect(() => {
+         if (!open) {
+             return undefined;
+@@ -29,7 +50,7 @@ export const Drawer = forwardRef(({ open, onClose, side = "right", size = "md",
+             previousFocusRef.current?.focus();
+         };
+     }, [open]);
+-    if (!mounted || !open) {
++    if (!mounted || !rendered) {
+         return null;
+     }
+     const handleBackdropMouseDown = (event) => {
+@@ -44,7 +65,7 @@ export const Drawer = forwardRef(({ open, onClose, side = "right", size = "md",
+         }
+     };
+     // UX REVIEW: high parity-risk — verify against Flutter render
+-    return createPortal(_jsxs("div", { className: clsx("acko-drawer-root", open && "acko-drawer-open"), "aria-hidden": open ? undefined : true, children: [_jsx("div", { className: "acko-drawer-backdrop", onMouseDown: handleBackdropMouseDown }), _jsxs("div", { ref: panelRef, className: clsx("acko-drawer", `acko-drawer-${side}`, `acko-drawer-size-${size}`, !hasHeader && "acko-drawer-no-header", className), role: "dialog", "aria-modal": "true", "aria-labelledby": title ? titleId : undefined, "aria-describedby": description ? descriptionId : undefined, tabIndex: -1, onKeyDown: handleKeyDown, children: [side === "bottom" ? (_jsx("div", { className: "acko-drawer-grab-handle", "aria-hidden": "true" })) : null, hasHeader ? (_jsxs("div", { className: "acko-drawer-header", children: [_jsxs("div", { className: "acko-drawer-heading", children: [title ? (_jsx("h2", { id: titleId, className: "acko-drawer-title", children: title })) : null, description ? (_jsx("p", { id: descriptionId, className: "acko-drawer-description", children: description })) : null] }), dismissible ? (_jsx("button", { className: "acko-drawer-close", type: "button", "aria-label": "Close drawer", onClick: onClose, children: _jsx(CloseIcon, {}) })) : null] })) : null, _jsx("div", { className: clsx("acko-drawer-body", !scrollable && "acko-drawer-body-no-scroll", bodyClassName), children: children }), footer ? _jsx("div", { className: "acko-drawer-footer", children: footer }) : null] })] }), document.body);
++    return createPortal(_jsxs("div", { className: clsx("acko-drawer-root", visible && "acko-drawer-open"), "aria-hidden": visible ? undefined : true, children: [_jsx("div", { className: "acko-drawer-backdrop", onMouseDown: handleBackdropMouseDown }), _jsxs("div", { ref: panelRef, className: clsx("acko-drawer", `acko-drawer-${side}`, `acko-drawer-size-${size}`, !hasHeader && "acko-drawer-no-header", className), role: "dialog", "aria-modal": "true", "aria-labelledby": title ? titleId : undefined, "aria-describedby": description ? descriptionId : undefined, tabIndex: -1, onKeyDown: handleKeyDown, children: [side === "bottom" ? (_jsx("div", { className: "acko-drawer-grab-handle", "aria-hidden": "true" })) : null, hasHeader ? (_jsxs("div", { className: "acko-drawer-header", children: [_jsxs("div", { className: "acko-drawer-heading", children: [title ? (_jsx("h2", { id: titleId, className: "acko-drawer-title", children: title })) : null, description ? (_jsx("p", { id: descriptionId, className: "acko-drawer-description", children: description })) : null] }), dismissible ? (_jsx("button", { className: "acko-drawer-close", type: "button", "aria-label": "Close drawer", onClick: onClose, children: _jsx(CloseIcon, {}) })) : null] })) : null, _jsx("div", { className: clsx("acko-drawer-body", !scrollable && "acko-drawer-body-no-scroll", bodyClassName), children: children }), footer ? _jsx("div", { className: "acko-drawer-footer", children: footer }) : null] })] }), document.body);
+ });
+ Drawer.displayName = "Drawer";
+ function CloseIcon() {

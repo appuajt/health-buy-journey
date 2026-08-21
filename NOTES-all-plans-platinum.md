@@ -156,6 +156,24 @@ disappears. Re-pointed at `--statusWarningSubtle`.
 **This is worth raising at the all-hands.** Every team is building on these packages, and
 the failure mode is silent.
 
+### A different kind of bug: `Drawer` has no open/close transition at all
+
+Not a token gap — a logic bug in the packaged React component. `Drawer.js` collapses DOM
+presence and the `-open` CSS class into the same `open` prop, so the panel's first paint
+already has its final `transform: translate(0)` — there is no closed frame for the CSS
+transition to animate from. Verified with a `requestAnimationFrame` trace: the panel's
+position was frozen across ~40 frames (700ms) on open. Close has the same problem in
+reverse — the DOM node is removed the instant `open` goes false, so the 350ms slide-out
+never gets to run. `Dialog` does not have this bug, because it drives its animation with a
+CSS `@keyframes` (which runs on insertion regardless of prior state) rather than a
+class-toggled `transition`.
+
+Fixed via `patch-package` — `patches/@acko+drawer+3.0.4.patch`, applied automatically on
+`npm install` via a `postinstall` script — splitting the single `open` prop into `rendered`
+(DOM presence) and `visible` (the `-open` class), with `visible` deferred two animation
+frames after mount and `rendered` deferred 360ms after close so both transitions get a
+real closed frame to run from. No change to the component's public API.
+
 ---
 
 ## Project setup notes

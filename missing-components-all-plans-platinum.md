@@ -13,7 +13,9 @@ Logged live while building, per the component sourcing rules in `CLAUDE.md`.
 >
 > Verified on this screen: **every `Card` renders square** (`--radius5xl`), **every
 > `Surface` and `Dialog` renders transparent with no scrim**, **every `Skeleton` is
-> invisible**, **`Table` has no borders or header fill**, **red `Badge` is unstyled**.
+> invisible**, **`Table` has no borders or header fill**, **red `Badge` is unstyled**,
+> **`Toggle`'s unpressed state has no fill or border**. Separately — not a token issue —
+> **`Drawer` opens and closes with no transition at all**; see its own entry below.
 > Most are the `--color*` names removed in the tokens v2 rename; the rest were never
 > shipped. Families still broken and not shimmed here: wizard, toast, tabs, toggle,
 > chip-selector, navbar, slider, progress, calendar, and the inverted/danger button
@@ -119,6 +121,22 @@ Logged live while building, per the component sourcing rules in `CLAUDE.md`.
 - **Also worth flagging:** the shipped token scale is one step larger than the documented one — `heading-md` is 24px in `@acko/tokens@2.0.6` but 20px in the typography reference. Plan titles use `heading-sm` (20px) to match the design.
 - **Props sketch:** no API change wanted — ship the missing `.acko-typography-*` rules, or drop the `variant`/`weight` props if `scale`/`emphasis` is the intended replacement. Right now both are in the type signature and only one works.
 - **Reuse potential:** HIGH — this affects literally every screen built on the design system.
+
+---
+
+## Drawer — opens and closes with no transition
+
+- **Type:** VARIANT-GAP
+- **Screen:** all-plans-platinum (14-all-plans-platinum.jpg)
+- **What it is:** The bottom sheet used by "View plan details" and "Compare plans" on mobile — should slide up from the bottom on open and slide down on close.
+- **Closest @acko component:** `Drawer` (`@acko/drawer`), used as-is with a patched `Drawer.js` — this is not a CSS token gap, it's a logic bug in the packaged React component.
+- **Why it didn't fit:** `Drawer.js` gates the entire panel — both its existence in the DOM and its `acko-drawer-open` class — behind a single `open` prop, in `if (!mounted || !open) return null`. When `open` flips from false to true, the panel's very first paint in the DOM already carries the `-open` class and its final `transform: translate(0)`. A CSS `transition` only animates a property across two *rendered* frames of an existing element — since the panel never existed in a closed state to transition from, it simply appears at rest. Verified with a `requestAnimationFrame` trace: the panel's `top` was identical across every one of ~40 frames over 700ms — zero motion. Close has the mirror problem: `!open` unmounts the DOM node on the same frame, so the 350ms slide-out CSS transition never gets to run either.
+
+  `@acko/dialog` does **not** have this problem — it drives its open animation with a CSS `@keyframes animation`, which runs automatically on element insertion regardless of prior state, rather than a class-toggled `transition`. Confirmed via the same frame trace: Dialog's opacity and scale interpolate smoothly from the first frame. Only `Drawer` needed fixing.
+
+- **Fix shipped:** patched via `patch-package` (`patches/@acko+drawer+3.0.4.patch`, applied automatically on `npm install` through a `postinstall` script) to split the single `open` prop into two internal states — `rendered` (DOM presence) and `visible` (the `-open` class) — with `visible` deferred by two `requestAnimationFrame`s after mount so the browser paints one real closed frame before the class flips, and `rendered` deferred by 360ms after `open` goes false so the close transition has time to play before the node is removed. No prop or behavioural change from the caller's side.
+- **Props sketch:** no API change — this is an internal-only fix. The component's own mount/unmount timing should do this itself.
+- **Reuse potential:** HIGH — every screen in the workshop using `Drawer` (any mobile bottom sheet, or a left/right/top drawer) has an sheet that pops open and vanishes shut with no transition, unless independently patched the same way.
 
 ---
 

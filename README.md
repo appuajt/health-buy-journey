@@ -55,4 +55,8 @@ define, and `typography.css` ships no CSS at all for the `variant`/`weight` API 
 `Typography` component emits. Both fail **silently** — no build error, no lint error.
 Symptoms include square cards, invisible skeletons, transparent surfaces and dialogs, and
 a completely flat type hierarchy. `src/index.css` carries a scoped compatibility shim.
-Details in the notes file.
+
+Separately, `@acko/drawer@3.0.4`'s `Drawer` component opens and closes with **no
+transition at all** — a logic bug, not a token gap. Fixed via `patch-package`
+(`patches/@acko+drawer+3.0.4.patch`, applied automatically on `npm install`). Details in
+the notes file.
