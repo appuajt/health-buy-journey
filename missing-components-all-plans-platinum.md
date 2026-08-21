@@ -155,6 +155,18 @@ Logged live while building, per the component sourcing rules in `CLAUDE.md`.
 
 ---
 
+## Button — no gradient-fill variant
+
+- **Type:** VARIANT-GAP
+- **Screen:** all-plans-platinum (14-all-plans-platinum.jpg)
+- **What it is:** The "Chat or call" pill's diagonal white-to-brand-tint gradient fill.
+- **Closest @acko component:** `Button` (`@acko/button`), `variant="secondary"` — used as-is; only the fill is overridden.
+- **Why it didn't fit:** `Button`'s variant set (primary/secondary/inverted/inverted-secondary/ghost/link/danger) has no gradient option — every fill is a flat colour. `shadows.md` documents a gradient recipe for **Badge** (`linear-gradient` + solid border), so the pattern exists in the system, just not extended to Button. Applying it needed `!important` on `background-image`, because `button.css`'s own hover and active rules set the `background` shorthand, which silently resets `background-image` to `none` even though only a colour was specified — without the override, the gradient would vanish the instant the pointer entered the pill.
+- **Props sketch:** wants a `variant="gradient"` (or a `gradient` prop) on `Button` that composites a brand-tint gradient the same way Badge's is documented, so callers don't need to fight the hover/active shorthand.
+- **Reuse potential:** MEDIUM — likely wanted anywhere a floating or hero CTA needs to stand out from a flat secondary button without going full primary-brand-fill.
+
+---
+
 ## CounterBadge / Badge — `color="red"` renders unstyled
 
 - **Type:** VARIANT-GAP

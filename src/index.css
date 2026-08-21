@@ -401,7 +401,19 @@ label {
   transition: bottom 200ms var(--appEaseInOut);
 }
 
+/* Gradient fill, brand-tinted at the trailing edge — button.css has no
+   gradient variant, so this is a scoped app override, logged in
+   missing-components-all-plans-platinum.md.
+   !important is required here: button.css's own hover/active rules set the
+   `background` SHORTHAND, which resets `background-image` to `none` even
+   though only a colour was specified. Without it, the gradient disappears
+   the instant the pointer enters the pill. */
 .chat-fab-anchor .acko-button {
+  background-image: linear-gradient(
+    135deg,
+    var(--surfaceFillCard) 0%,
+    var(--fillBrandSubtle) 100%
+  ) !important;
   box-shadow: var(--shadowM);
 }
 
@@ -409,6 +421,16 @@ label {
   .chat-fab-anchor .acko-button:hover {
     box-shadow: var(--shadowL);
   }
+}
+
+/* button.css's :active rule also uses !important — matching it here so the
+   gradient survives a press too, not only hover. */
+.chat-fab-anchor .acko-button:active {
+  background-image: linear-gradient(
+    135deg,
+    var(--surfaceFillCard) 0%,
+    var(--fillBrandSubtle) 100%
+  ) !important;
 }
 
 .chat-fab-counter {
