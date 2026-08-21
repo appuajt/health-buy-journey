@@ -159,6 +159,25 @@ label {
   --radius5xl: var(--radius4xl);
   --cardBorderSecondary: var(--cardBorderDefault);
 
+  /* Secondary button hover/active fills. button.css sets `background` to these
+     tokens directly rather than layering a tint over the button's own fill, so
+     an alpha colour here doesn't tint the button — it REPLACES the opaque fill
+     with something 92%/84% see-through, letting whatever sits behind the
+     button show through. Invisible on a secondary button over a flat page,
+     glaring on one floating over real content (e.g. the chat pill over a
+     card). Composited to the equivalent opaque colour so the visual tint is
+     identical but nothing behind it can ever bleed through. */
+  --buttonFillSecondaryHover: color-mix(
+    in srgb,
+    var(--brandPrimary) 8%,
+    var(--buttonFillSecondaryDefault)
+  );
+  --buttonFillSecondaryActive: color-mix(
+    in srgb,
+    var(--brandPrimary) 16%,
+    var(--buttonFillSecondaryDefault)
+  );
+
   /* Button text roles. button.css documents secondary as "surface fill + brand
      border" and ghost as "transparent fill, brand text", so secondary takes the
      brand text colour to match its brand border. Ghost is deliberately left

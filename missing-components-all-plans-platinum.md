@@ -140,6 +140,21 @@ Logged live while building, per the component sourcing rules in `CLAUDE.md`.
 
 ---
 
+## Button (secondary) — hover/press fill is translucent, not tinted
+
+- **Type:** VARIANT-GAP
+- **Screen:** all-plans-platinum (14-all-plans-platinum.jpg)
+- **What it is:** Hovering or pressing the "Chat or call" pill (a `Button variant="secondary"`) made its fill 92% see-through, letting the card content underneath show through it — a "liquid glass" look, not a tint.
+- **Closest @acko component:** `Button` (`@acko/button`), `variant="secondary"` — used as-is; the fix is a token override, not a different component.
+- **Why it didn't fit:** `button.css` sets `.acko-button-secondary:hover { background: var(--buttonFillSecondaryHover) }` and the `:active` equivalent — a plain replace, not a tint layered over the button's existing fill. `--buttonFillSecondaryHover` resolves to `rgba(153, 116, 249, 0.08)` and `--buttonFillSecondaryActive` to `rgba(153, 116, 249, 0.16)` — 8% and 16% opacity purple respectively. Since `background` fully replaces rather than composites, the button's opaque default fill is swapped for something almost entirely transparent, and whatever sits behind it (here, the plan card's notice text) bleeds through. Invisible on a secondary button sitting over a flat page — the fix is only visible on one floating over real content, like this pill. `Button variant="primary"` doesn't have this problem: its hover/active tokens (`--fillBrandHover`, `--fillBrandActive`) are opaque solids.
+
+  Separate but related: this state is correctly gated behind `@media (hover: hover) and (pointer: fine)`, per touch-accessibility.md, so it never fires on a real touch phone. It surfaced during review because the reviewer harness (this repo's Mobile/Tablet/Web preview) only emulates layout **width** via an iframe — it can't emulate touch input, so a reviewer's actual mouse still reports `pointer: fine`. The hover rule firing there is correct browser behaviour, not a preview bug; the transparency underneath it is the real bug, and would equally hit any pointer device (trackpad, touchscreen laptop in tablet mode) on a genuinely narrow viewport.
+- **Fix shipped:** re-pointed both tokens at `color-mix(in srgb, var(--brandPrimary) 8%/16%, var(--buttonFillSecondaryDefault))` — the same visual tint, composited to an opaque result so nothing behind the button can bleed through.
+- **Props sketch:** no API change — `background` in `button.css` should composite the tint over the button's own fill (e.g. via `color-mix()` in the stylesheet itself), or the hover/active tokens should ship as opaque colours the way the primary variant's already are.
+- **Reuse potential:** HIGH — every secondary button in the product has this on hover and press; it just doesn't show until the button sits over something worth looking at.
+
+---
+
 ## CounterBadge / Badge — `color="red"` renders unstyled
 
 - **Type:** VARIANT-GAP
