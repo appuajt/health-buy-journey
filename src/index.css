@@ -459,6 +459,26 @@ label {
   width: 34%;
 }
 
+/* ─── Sheet close button — tap target ───────────────────────────────────────
+   Drawer and Dialog both ship a real, correctly-labelled close (✕) button —
+   dismissible defaults to true and neither is overridden anywhere in this
+   app — but drawer.css / dialog.css hardcode it at 32×32px, under the 44px
+   minimum tap target (touch-accessibility.md). Extended with the exact
+   pseudo-element pattern that file documents, rather than resizing the
+   visible icon.
+   ────────────────────────────────────────────────────────────────────────── */
+.acko-drawer-close,
+.acko-dialog-close {
+  position: relative;
+}
+
+.acko-drawer-close::before,
+.acko-dialog-close::before {
+  content: "";
+  position: absolute;
+  inset: calc((44px - 100%) / -2);
+}
+
 /* ─── Preview harness ───────────────────────────────────────────────────────
    Reviewer-facing shell for the published demo — not product UI. Renders the
    screen in a device-sized iframe so its breakpoints and fixed chrome behave

@@ -155,6 +155,19 @@ Logged live while building, per the component sourcing rules in `CLAUDE.md`.
 
 ---
 
+## Drawer / Dialog — close button under the 44px minimum tap target
+
+- **Type:** VARIANT-GAP
+- **Screen:** all-plans-platinum (14-all-plans-platinum.jpg)
+- **What it is:** The ✕ close button in the header of both sheets (plan details, compare). It already exists by default — `dismissible` defaults to `true` and is never overridden — and is correctly labelled (`aria-label="Close drawer"` / `"Close dialog"`).
+- **Closest @acko component:** `Drawer` (`@acko/drawer`) and `Dialog` (`@acko/dialog`) — used as-is; only the tap area is extended.
+- **Why it didn't fit:** `drawer.css` and `dialog.css` both hardcode the close button at `32×32px` — below the 44px minimum tap target this workshop's own rules require (touch-accessibility.md). The visible icon is fine at that size; the *hit area* isn't.
+- **Fix shipped:** the exact pseudo-element pattern touch-accessibility.md documents for this — `.acko-drawer-close::before` / `.acko-dialog-close::before` with `inset: calc((44px - 100%) / -2)` — extends the tappable area to 44×44px without resizing the visible icon. Verified: a click 4px outside the visible icon still closes the sheet; a 6px gap remains clear of the header title, no overlap.
+- **Props sketch:** no API change — the 44px minimum should be the shipped default, same as `Button`'s icon-only sizes already are.
+- **Reuse potential:** HIGH — every `Drawer` and `Dialog` in the product has this same undersized close target.
+
+---
+
 ## Button — no gradient-fill variant
 
 - **Type:** VARIANT-GAP
