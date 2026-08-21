@@ -203,8 +203,31 @@ label {
 
   /* Alert — @acko/tokens aliases the warning SURFACE to the warning BORDER
      token, so the callout fills solid with its own border colour and the
-     border vanishes. Repointed at the intended subtle tint. */
-  --alertWarningSurface: var(--statusWarningSubtle);
+     border vanishes. Even repointed at --statusWarningSubtle the fill and the
+     border sit within a few percent of each other, so the notice reads as a
+     slab of peach rather than a bordered callout.
+
+     Softened by mixing the tint back toward the card it sits on — the same
+     color-mix-of-tokens approach the card guidance uses for demoted strips —
+     and letting the border carry the warning signal instead of the fill. */
+  --alertWarningSurface: color-mix(
+    in srgb,
+    var(--statusWarningSubtle) 45%,
+    var(--surfaceFillCard)
+  );
+  --alertWarningBorder: color-mix(
+    in srgb,
+    var(--statusWarningText) 22%,
+    var(--surfaceFillCard)
+  );
+}
+
+/* alert.css hardcodes --radiusLg (8px) — tighter than this card's own 20px
+   radius, so the notice reads as a separate chip rather than belonging inside
+   the card. cards.md's inset-radius rule (outer radius minus padding) gives
+   --radius2xl here, which is what AlertCard already uses elsewhere. */
+.acko-alert {
+  border-radius: var(--radius2xl);
 }
 
 /* @acko/css@3.0.4 skeleton.css builds its wave from the removed --colorSurface;
